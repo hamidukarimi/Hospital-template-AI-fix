@@ -11,6 +11,18 @@ import { SearchInput } from "../../components/SearchInput";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/Toast";
 import adminApi from "../../services/adminApi";
+import {
+  adminFormActionsClass,
+  adminFormClass,
+  adminFormGridClass,
+  adminFormPageWrap,
+} from "../../utils/adminHelpers";
+
+interface FooterColumnOption {
+  id: string;
+  title: string;
+  isActive?: boolean;
+}
 
 interface FooterLinkItem {
   id: string;
@@ -42,6 +54,10 @@ const FooterLinksPage = () => {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [footerColumns, setFooterColumns] = useState<FooterColumnOption[]>(
+    [],
+  );
+  const [columnsLoading, setColumnsLoading] = useState(false);
 
   const isFormView =
     location.pathname.endsWith("/new") ||
@@ -99,6 +115,30 @@ const FooterLinksPage = () => {
     void loadItem();
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!isFormView) return;
+
+    const loadColumns = async () => {
+      setColumnsLoading(true);
+      try {
+        const data = await adminApi.get<FooterColumnOption[]>(
+          "/admin/footer-columns",
+        );
+        setFooterColumns(data ?? []);
+      } catch {
+        pushToast({
+          type: "error",
+          title: "Unable to load footer columns",
+          description: "Refresh the page and try again.",
+        });
+      } finally {
+        setColumnsLoading(false);
+      }
+    };
+
+    void loadColumns();
+  }, [isFormView, pushToast]);
+
   const filtered = useMemo(() => {
     const value = search.trim().toLowerCase();
     if (!value) return items;
@@ -120,8 +160,7 @@ const FooterLinksPage = () => {
         url: form.url.trim(),
         sortOrder: Number(form.sortOrder) || 0,
         isActive: form.isActive,
-        footerColumnId:
-          form.footerColumnId || "00000000-0000-0000-0000-000000000000",
+        footerColumnId: form.footerColumnId.trim(),
       };
 
       if (!payload.label || !payload.url) {
@@ -129,6 +168,15 @@ const FooterLinksPage = () => {
           type: "error",
           title: "Required details missing",
           description: "Label and URL are required.",
+        });
+        return;
+      }
+
+      if (!payload.footerColumnId) {
+        pushToast({
+          type: "error",
+          title: "Footer column required",
+          description: "Select the footer column this link belongs to.",
         });
         return;
       }
@@ -181,7 +229,7 @@ const FooterLinksPage = () => {
 
   if (isFormView) {
     return (
-      <div className="mx-auto max-w-3xl">
+      <div className={adminFormPageWrap.sm}>
         <PageHeader
           title={editingId ? "Edit footer link" : "Create footer link"}
           description={
@@ -192,12 +240,36 @@ const FooterLinksPage = () => {
           backLink="/admin/footer-links"
         />
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <div className="grid gap-5 md:grid-cols-2">
-            <label className="space-y-2">
+        <form onSubmit={handleSubmit} className={adminFormClass}>
+          <div className={adminFormGridClass}>
+            <label className="min-w-0 space-y-2 md:col-span-2">
+              <span className="text-sm font-medium text-slate-700">
+                Footer column
+              </span>
+              <select
+                value={form.footerColumnId}
+                onChange={(event) =>
+                  setForm({ ...form, footerColumnId: event.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
+                required
+                disabled={columnsLoading}
+              >
+                <option value="">
+                  {columnsLoading
+                    ? "Loading columns..."
+                    : "Select a footer column"}
+                </option>
+                {footerColumns.map((column) => (
+                  <option key={column.id} value={column.id}>
+                    {column.title}
+                    {column.isActive === false ? " (inactive)" : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="min-w-0 space-y-2">
               <span className="text-sm font-medium text-slate-700">Label</span>
               <input
                 value={form.label}
@@ -248,10 +320,10 @@ const FooterLinksPage = () => {
             </label>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className={adminFormActionsClass}>
             <Link
               to="/admin/footer-links"
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-700"
             >
               Cancel
             </Link>

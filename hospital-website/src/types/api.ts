@@ -10,8 +10,10 @@ export interface SiteSettings {
   hospitalName: string;
   logo?: string | null;
   phone: string;
+  emergencyPhone?: string | null;
   email: string;
   address: string;
+  mapEmbedUrl?: string | null;
   sundayVisitingHours?: string | null;
   mondayFridayVisitingHours?: string | null;
   socialMedia: SocialMedia[];
@@ -71,14 +73,52 @@ export interface AboutSection {
 export interface Service {
   id: string;
   title: string;
+  slug: string;
   description: string;
   image?: string | null;
   category?: string | null;
   linkText?: string | null;
   linkUrl?: string | null;
   color?: string | null;
+  heroTitle?: string | null;
+  heroDescription?: string | null;
+  heroImage?: string | null;
+  ctaText?: string | null;
+  ctaUrl?: string | null;
+  rating?: number | string | null;
+  ratingText?: string | null;
+  supportTitle?: string | null;
+  supportDescription?: string | null;
+  supportIcon?: string | null;
+  overviewSmallTitle?: string | null;
+  overviewTitle?: string | null;
+  overviewDescription?: string | null;
+  overviewImage?: string | null;
+  overviewSecondaryTitle?: string | null;
+  overviewSecondaryDescription?: string | null;
+  overviewCtaText?: string | null;
+  overviewCtaUrl?: string | null;
+  metrics?: ServiceMetric[];
+  partners?: ServicePartner[];
   isActive: boolean;
   sortOrder: number;
+}
+
+export interface ServiceMetric {
+  id: string;
+  label: string;
+  value: number;
+  suffix?: string | null;
+  sortOrder: number;
+  isActive: boolean;
+}
+export interface ServicePartner {
+  id: string;
+  name: string;
+  logo?: string | null;
+  url?: string | null;
+  sortOrder: number;
+  isActive: boolean;
 }
 
 export interface Testimonial {

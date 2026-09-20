@@ -11,6 +11,18 @@ import { SearchInput } from "../../components/SearchInput";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/Toast";
 import adminApi from "../../services/adminApi";
+import {
+  adminFormActionsClass,
+  adminFormClass,
+  adminFormGridClass,
+  adminFormPageWrap,
+} from "../../utils/adminHelpers";
+
+interface HelpSectionOption {
+  id: string;
+  title: string;
+  isActive?: boolean;
+}
 
 interface HelpCardItem {
   id: string;
@@ -58,6 +70,8 @@ const HelpCardsPage = () => {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [helpSections, setHelpSections] = useState<HelpSectionOption[]>([]);
+  const [sectionsLoading, setSectionsLoading] = useState(false);
 
   const isFormView =
     location.pathname.endsWith("/new") ||
@@ -117,6 +131,30 @@ const HelpCardsPage = () => {
     void loadItem();
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!isFormView) return;
+
+    const loadSections = async () => {
+      setSectionsLoading(true);
+      try {
+        const data = await adminApi.get<HelpSectionOption[]>(
+          "/admin/help-cards/sections",
+        );
+        setHelpSections(data ?? []);
+      } catch {
+        pushToast({
+          type: "error",
+          title: "Unable to load help sections",
+          description: "Refresh the page and try again.",
+        });
+      } finally {
+        setSectionsLoading(false);
+      }
+    };
+
+    void loadSections();
+  }, [isFormView, pushToast]);
+
   const filtered = useMemo(() => {
     const value = search.trim().toLowerCase();
     if (!value) return items;
@@ -142,8 +180,7 @@ const HelpCardsPage = () => {
         color: form.color,
         sortOrder: Number(form.sortOrder) || 0,
         isActive: form.isActive,
-        helpSectionId:
-          form.helpSectionId || "00000000-0000-0000-0000-000000000000",
+        helpSectionId: form.helpSectionId.trim(),
       };
 
       if (
@@ -156,6 +193,15 @@ const HelpCardsPage = () => {
           type: "error",
           title: "Missing required fields",
           description: "Title, description, button text, and URL are required.",
+        });
+        return;
+      }
+
+      if (!payload.helpSectionId) {
+        pushToast({
+          type: "error",
+          title: "Help section required",
+          description: "Select the help section this card belongs to.",
         });
         return;
       }
@@ -214,7 +260,7 @@ const HelpCardsPage = () => {
 
   if (isFormView) {
     return (
-      <div className="mx-auto max-w-4xl">
+      <div className={adminFormPageWrap.md}>
         <PageHeader
           title={editingId ? "Edit help card" : "Create help card"}
           description={
@@ -225,12 +271,36 @@ const HelpCardsPage = () => {
           backLink="/admin/help-cards"
         />
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <div className="grid gap-5 md:grid-cols-2">
-            <label className="space-y-2">
+        <form onSubmit={handleSubmit} className={adminFormClass}>
+          <div className={adminFormGridClass}>
+            <label className="min-w-0 space-y-2 md:col-span-2">
+              <span className="text-sm font-medium text-slate-700">
+                Help section
+              </span>
+              <select
+                value={form.helpSectionId}
+                onChange={(event) =>
+                  setForm({ ...form, helpSectionId: event.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
+                required
+                disabled={sectionsLoading}
+              >
+                <option value="">
+                  {sectionsLoading
+                    ? "Loading sections..."
+                    : "Select a help section"}
+                </option>
+                {helpSections.map((section) => (
+                  <option key={section.id} value={section.id}>
+                    {section.title}
+                    {section.isActive === false ? " (inactive)" : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="min-w-0 space-y-2">
               <span className="text-sm font-medium text-slate-700">Title</span>
               <input
                 value={form.title}
@@ -341,10 +411,10 @@ const HelpCardsPage = () => {
             </label>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className={adminFormActionsClass}>
             <Link
               to="/admin/help-cards"
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-700"
             >
               Cancel
             </Link>

@@ -19,12 +19,18 @@ import SocialMediaPage from "./admin/pages/social-media/SocialMediaPage";
 import TestimonialPage from "./admin/pages/testimonials/TestimonialsPage";
 import WhyChooseUsPage from "./admin/pages/why-choose-us/WhyChooseUsPage";
 
+import ServiceDetailsPage from "./pages/ServiceDetailsPage";
+import ContactPage from "./pages/ContactPage"; // <-- 1. Import ContactPage
+import AboutPage from "./pages/AboutPage";
+
 function App() {
   return (
     <BrowserRouter>
       <ToastProvider>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/contact" element={<ContactPage />} /> {/* <-- 2. Add Route */}
+          <Route path="/about" element={<AboutPage />} />
 
           <Route path="/admin/login" element={<AdminLogin />} />
 
@@ -67,6 +73,7 @@ function App() {
               />
             </Route>
           </Route>
+          <Route path="/services/:slug" element={<ServiceDetailsPage />} />
         </Routes>
       </ToastProvider>
     </BrowserRouter>

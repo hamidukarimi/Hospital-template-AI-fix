@@ -100,3 +100,19 @@ export const toIdentifier = (value: string) => {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 };
+
+/** Shared layout classes so admin create/edit forms stay within the viewport on mobile. */
+export const adminFormPageWrap = {
+  sm: "mx-auto w-full min-w-0 max-w-3xl",
+  md: "mx-auto w-full min-w-0 max-w-4xl",
+  lg: "mx-auto w-full min-w-0 max-w-5xl",
+} as const;
+
+export const adminFormClass =
+  "min-w-0 max-w-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm [&_input]:min-w-0 [&_input]:max-w-full [&_select]:min-w-0 [&_select]:max-w-full [&_textarea]:min-w-0 [&_textarea]:max-w-full";
+
+export const adminFormGridClass =
+  "grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2";
+
+export const adminFormActionsClass =
+  "mt-6 flex min-w-0 flex-col-reverse gap-3 sm:flex-row sm:flex-wrap sm:justify-end";

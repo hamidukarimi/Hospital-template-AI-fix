@@ -11,6 +11,12 @@ import { SearchInput } from "../../components/SearchInput";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/Toast";
 import adminApi from "../../services/adminApi";
+import {
+  adminFormActionsClass,
+  adminFormClass,
+  adminFormGridClass,
+  adminFormPageWrap,
+} from "../../utils/adminHelpers";
 
 interface SocialMediaItem {
   id: string;
@@ -190,7 +196,7 @@ const SocialMediaPage = () => {
 
   if (isFormView) {
     return (
-      <div className="mx-auto max-w-3xl">
+      <div className={adminFormPageWrap.sm}>
         <PageHeader
           title={editingId ? "Edit social media" : "Create social media"}
           description={
@@ -201,11 +207,8 @@ const SocialMediaPage = () => {
           backLink="/admin/social-media"
         />
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <div className="grid gap-5 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className={adminFormClass}>
+          <div className={adminFormGridClass}>
             <label className="space-y-2">
               <span className="text-sm font-medium text-slate-700">
                 Platform
@@ -252,10 +255,10 @@ const SocialMediaPage = () => {
             </label>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className={adminFormActionsClass}>
             <Link
               to="/admin/social-media"
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-700"
             >
               Cancel
             </Link>

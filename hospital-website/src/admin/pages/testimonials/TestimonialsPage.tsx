@@ -11,6 +11,12 @@ import { SearchInput } from "../../components/SearchInput";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/Toast";
 import adminApi from "../../services/adminApi";
+import {
+  adminFormActionsClass,
+  adminFormClass,
+  adminFormGridClass,
+  adminFormPageWrap,
+} from "../../utils/adminHelpers";
 
 interface TestimonialItem {
   id: string;
@@ -197,7 +203,7 @@ const TestimonialsPage = () => {
 
   if (isFormView) {
     return (
-      <div className="mx-auto max-w-4xl">
+      <div className={adminFormPageWrap.md}>
         <PageHeader
           title={editingId ? "Edit testimonial" : "Create testimonial"}
           description={
@@ -208,11 +214,8 @@ const TestimonialsPage = () => {
           backLink="/admin/testimonials"
         />
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <div className="grid gap-5 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className={adminFormClass}>
+          <div className={adminFormGridClass}>
             <label className="space-y-2">
               <span className="text-sm font-medium text-slate-700">Name</span>
               <input
@@ -306,10 +309,10 @@ const TestimonialsPage = () => {
             </label>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className={adminFormActionsClass}>
             <Link
               to="/admin/testimonials"
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-700"
             >
               Cancel
             </Link>

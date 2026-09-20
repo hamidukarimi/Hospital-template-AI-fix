@@ -11,11 +11,18 @@ import { SearchInput } from "../../components/SearchInput";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/Toast";
 import adminApi from "../../services/adminApi";
+import {
+  adminFormActionsClass,
+  adminFormClass,
+  adminFormGridClass,
+  adminFormPageWrap,
+} from "../../utils/adminHelpers";
 import { getImageUrl } from "../../utils/adminHelpers";
 
 interface ServiceItem {
   id: string;
   title: string;
+  slug?: string | null;
   description: string;
   image?: string | null;
   category?: string | null;
@@ -24,10 +31,26 @@ interface ServiceItem {
   color: string;
   isActive?: boolean;
   sortOrder?: number;
+  heroTitle?: string | null;
+  heroDescription?: string | null;
+  heroImage?: string | null;
+  ctaText?: string | null;
+  ctaUrl?: string | null;
+  overviewSmallTitle?: string | null;
+  overviewTitle?: string | null;
+  overviewDescription?: string | null;
+  overviewImage?: string | null;
+  overviewSecondaryTitle?: string | null;
+  overviewSecondaryDescription?: string | null;
+  overviewCtaText?: string | null;
+  overviewCtaUrl?: string | null;
+  metrics?: unknown[];
+  partners?: unknown[];
 }
 
 const emptyForm = {
   title: "",
+  slug: "",
   description: "",
   image: "",
   category: "",
@@ -36,6 +59,21 @@ const emptyForm = {
   color: "#147BD5",
   isActive: true,
   sortOrder: 0,
+  heroTitle: "",
+  heroDescription: "",
+  heroImage: "",
+  ctaText: "",
+  ctaUrl: "",
+  overviewSmallTitle: "",
+  overviewTitle: "",
+  overviewDescription: "",
+  overviewImage: "",
+  overviewSecondaryTitle: "",
+  overviewSecondaryDescription: "",
+  overviewCtaText: "",
+  overviewCtaUrl: "",
+  metricsJson: "[]",
+  partnersJson: "[]",
 };
 
 const ServicesPage = () => {
@@ -96,6 +134,7 @@ const ServicesPage = () => {
         setEditingId(id);
         setForm({
           title: item.title ?? "",
+          slug: item.slug ?? "",
           description: item.description ?? "",
           image: item.image ?? "",
           category: item.category ?? "",
@@ -104,6 +143,21 @@ const ServicesPage = () => {
           color: item.color ?? "#147BD5",
           isActive: item.isActive ?? true,
           sortOrder: item.sortOrder ?? 0,
+          heroTitle: item.heroTitle ?? "",
+          heroDescription: item.heroDescription ?? "",
+          heroImage: item.heroImage ?? "",
+          ctaText: item.ctaText ?? "",
+          ctaUrl: item.ctaUrl ?? "",
+          overviewSmallTitle: item.overviewSmallTitle ?? "",
+          overviewTitle: item.overviewTitle ?? "",
+          overviewDescription: item.overviewDescription ?? "",
+          overviewImage: item.overviewImage ?? "",
+          overviewSecondaryTitle: item.overviewSecondaryTitle ?? "",
+          overviewSecondaryDescription: item.overviewSecondaryDescription ?? "",
+          overviewCtaText: item.overviewCtaText ?? "",
+          overviewCtaUrl: item.overviewCtaUrl ?? "",
+          metricsJson: JSON.stringify(item.metrics ?? [], null, 2),
+          partnersJson: JSON.stringify(item.partners ?? [], null, 2),
         });
       } catch {
         setError("Unable to load service for editing.");
@@ -131,6 +185,7 @@ const ServicesPage = () => {
     try {
       const payload = {
         title: form.title.trim(),
+        slug: form.slug.trim() || undefined,
         description: form.description.trim(),
         image: form.image.trim(),
         category: form.category.trim() || null,
@@ -139,6 +194,11 @@ const ServicesPage = () => {
         color: form.color,
         isActive: form.isActive,
         sortOrder: Number(form.sortOrder) || 0,
+        ctaText: form.ctaText.trim() || null,
+        ctaUrl: form.ctaUrl.trim() || null,
+        overviewTitle: form.overviewTitle.trim() || null,
+        overviewDescription: form.overviewDescription.trim() || null,
+        metrics: JSON.parse(form.metricsJson || "[]"),
       };
 
       if (!payload.title || !payload.description) {
@@ -198,7 +258,7 @@ const ServicesPage = () => {
 
   if (isFormView) {
     return (
-      <div className="mx-auto max-w-4xl">
+      <div className={adminFormPageWrap.md}>
         <PageHeader
           title={editingId ? "Edit service" : "Create service"}
           description={
@@ -209,11 +269,8 @@ const ServicesPage = () => {
           backLink="/admin/services"
         />
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <div className="grid gap-5 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className={adminFormClass}>
+          <div className={adminFormGridClass}>
             <label className="space-y-2 md:col-span-2">
               <span className="text-sm font-medium text-slate-700">Title</span>
               <input
@@ -223,6 +280,20 @@ const ServicesPage = () => {
                 }
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
                 required
+              />
+            </label>
+
+            <label className="space-y-2 md:col-span-2">
+              <span className="text-sm font-medium text-slate-700">
+                Public slug
+              </span>
+              <input
+                value={form.slug}
+                onChange={(event) =>
+                  setForm({ ...form, slug: event.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
+                placeholder="cardiology"
               />
             </label>
 
@@ -238,6 +309,84 @@ const ServicesPage = () => {
                 rows={4}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
                 required
+              />
+            </label>
+
+            <div className="border-t border-slate-200 pt-5 md:col-span-2">
+              <h2 className="text-lg font-semibold text-slate-900">
+                Service details
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Content shown on the public slug page.
+              </p>
+            </div>
+            {(
+              [
+                "heroTitle",
+                "heroDescription",
+                "heroImage",
+                "ctaText",
+                "ctaUrl",
+                "overviewSmallTitle",
+                "overviewTitle",
+                "overviewDescription",
+                "overviewImage",
+                "overviewSecondaryTitle",
+                "overviewSecondaryDescription",
+                "overviewCtaText",
+                "overviewCtaUrl",
+              ] as const
+            ).map((field) => (
+              <label key={field} className="space-y-2 md:col-span-2">
+                <span className="text-sm font-medium capitalize text-slate-700">
+                  {field.replace(/[A-Z]/g, (letter) => ` ${letter}`)}
+                </span>
+                {field.toLowerCase().includes("description") ? (
+                  <textarea
+                    rows={3}
+                    value={form[field]}
+                    onChange={(event) =>
+                      setForm({ ...form, [field]: event.target.value })
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
+                  />
+                ) : (
+                  <input
+                    value={form[field]}
+                    onChange={(event) =>
+                      setForm({ ...form, [field]: event.target.value })
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
+                  />
+                )}
+              </label>
+            ))}
+            <label className="space-y-2 md:col-span-2">
+              <span className="text-sm font-medium text-slate-700">
+                Hero and overview metrics JSON
+              </span>
+              <textarea
+                rows={5}
+                value={form.metricsJson}
+                onChange={(event) =>
+                  setForm({ ...form, metricsJson: event.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-xs"
+                placeholder='[{"label":"Departments","value":24,"suffix":"+","sortOrder":1}]'
+              />
+            </label>
+            <label className="space-y-2 md:col-span-2">
+              <span className="text-sm font-medium text-slate-700">
+                Partners JSON
+              </span>
+              <textarea
+                rows={5}
+                value={form.partnersJson}
+                onChange={(event) =>
+                  setForm({ ...form, partnersJson: event.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-xs"
+                placeholder='[{"name":"Joint Commission International","sortOrder":1}]'
               />
             </label>
 
@@ -335,10 +484,10 @@ const ServicesPage = () => {
             </label>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className={adminFormActionsClass}>
             <Link
               to="/admin/services"
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-700"
             >
               Cancel
             </Link>

@@ -181,7 +181,7 @@ export const AdminLayout = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex min-h-screen flex-1 flex-col"
+          className="flex min-h-screen min-w-0 flex-1 flex-col"
         >
           <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-4 px-4 py-4 md:px-6 xl:px-8">
@@ -240,7 +240,7 @@ export const AdminLayout = () => {
             </div>
           </header>
 
-          <main className="flex-1 px-4 py-6 md:px-6 xl:px-8">
+          <main className="min-w-0 flex-1 px-4 py-6 md:px-6 xl:px-8">
             <Outlet />
           </main>
         </motion.div>
@@ -260,10 +260,10 @@ export const AdminLayout = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -24, opacity: 0 }}
               transition={{ duration: 0.18 }}
-              className="h-full w-72 bg-[#111111] p-4 text-white"
+              className="flex h-full max-h-[100dvh] w-72 flex-col bg-[#111111] p-4 text-white"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="mb-6 flex items-center justify-between">
+              <div className="mb-6 flex shrink-0 items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#147BD5] font-bold text-white">
                     A
@@ -283,7 +283,7 @@ export const AdminLayout = () => {
                 </button>
               </div>
 
-              <nav className="space-y-6">
+              <nav className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain pr-1">
                 {menuGroups.map((group) => (
                   <div key={group.title}>
                     <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
@@ -315,7 +315,7 @@ export const AdminLayout = () => {
                 ))}
               </nav>
 
-              <div className="mt-8 border-t border-white/10 pt-4">
+              <div className="mt-4 shrink-0 border-t border-white/10 pt-4">
                 <button
                   type="button"
                   onClick={handleLogout}

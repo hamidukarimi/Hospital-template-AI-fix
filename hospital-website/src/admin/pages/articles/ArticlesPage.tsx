@@ -11,6 +11,12 @@ import { SearchInput } from "../../components/SearchInput";
 import { StatusBadge } from "../../components/StatusBadge";
 import { useToast } from "../../components/Toast";
 import adminApi from "../../services/adminApi";
+import {
+  adminFormActionsClass,
+  adminFormClass,
+  adminFormGridClass,
+  adminFormPageWrap,
+} from "../../utils/adminHelpers";
 import { formatDate } from "../../utils/adminHelpers";
 
 interface ArticleItem {
@@ -199,7 +205,7 @@ const ArticlesPage = () => {
 
   if (isFormView) {
     return (
-      <div className="mx-auto max-w-5xl">
+      <div className={adminFormPageWrap.lg}>
         <PageHeader
           title={editingId ? "Edit article" : "Create article"}
           description={
@@ -210,11 +216,8 @@ const ArticlesPage = () => {
           backLink="/admin/articles"
         />
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <div className="grid gap-5 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className={adminFormClass}>
+          <div className={adminFormGridClass}>
             <label className="space-y-2 md:col-span-2">
               <span className="text-sm font-medium text-slate-700">Title</span>
               <input
@@ -337,10 +340,10 @@ const ArticlesPage = () => {
             </label>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className={adminFormActionsClass}>
             <Link
               to="/admin/articles"
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-700"
             >
               Cancel
             </Link>

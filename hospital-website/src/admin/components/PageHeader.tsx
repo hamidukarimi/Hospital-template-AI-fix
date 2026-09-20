@@ -16,8 +16,8 @@ export const PageHeader = ({
   backLink,
 }: PageHeaderProps) => {
   return (
-    <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div className="flex items-start gap-3">
+    <div className="mb-6 flex min-w-0 flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex min-w-0 items-start gap-3">
         {backLink && (
           <Link
             to={backLink}
@@ -28,8 +28,8 @@ export const PageHeader = ({
           </Link>
         )}
 
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
+        <div className="min-w-0">
+          <h1 className="break-words text-2xl font-bold text-slate-900 md:text-3xl">
             {title}
           </h1>
           {description && (
